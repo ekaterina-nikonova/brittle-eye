@@ -3,10 +3,12 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.brittlepins.recognitionlibrary">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <application>
         <activity
             android:name=".CameraActivity"
-            android:label=".CameraActivity"
+            android:label="Component Search"
             android:theme="@style/AppTheme">
 
             <intent-filter>
