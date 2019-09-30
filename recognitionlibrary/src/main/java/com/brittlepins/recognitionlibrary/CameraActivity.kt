@@ -2,7 +2,9 @@ package com.brittlepins.recognitionlibrary
 
 import android.app.Activity
 import android.content.Context
+import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.graphics.Matrix
 import android.graphics.Rect
@@ -225,7 +227,11 @@ class CameraActivity : AppCompatActivity() {
 
         private fun showNewComponentPrompt(label: String) {
             done = true
-            activity.requestedOrientation = resources.configuration.orientation
+            if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+            } else {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+            }
             Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE).show()
         }
 
