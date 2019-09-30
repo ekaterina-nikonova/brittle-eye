@@ -3,6 +3,7 @@ package com.brittlepins.recognitionlibrary
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.Resources
 import android.graphics.Matrix
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +21,7 @@ import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager
 import com.google.firebase.ml.common.modeldownload.FirebaseRemoteModel
@@ -31,10 +33,10 @@ import com.google.firebase.ml.vision.objects.FirebaseVisionObject
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions
 
-private const val CAMERA_PERMISSION_REQUEST_CODE = 10
-private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
-
 class CameraActivity : AppCompatActivity() {
+    private val CAMERA_PERMISSION_REQUEST_CODE = 10
+    private val REQUIRED_PERMISSIONS = arrayOf(android.Manifest.permission.CAMERA)
+
     private val TAG = "AddComponentActivity"
     private val activity: Activity = this
 
@@ -105,7 +107,16 @@ class CameraActivity : AppCompatActivity() {
             setCallbackHandler(Handler(analyzerThread.looper))
             setImageReaderMode(ImageAnalysis.ImageReaderMode.ACQUIRE_LATEST_IMAGE)
         }.build()
-        val analyzerUseCase = ImageAnalysis(analyzerConfig).apply { analyzer = ImageAnalyzer(activity, applicationContext, graphicOverlay, preview, viewFinder) }
+        val analyzerUseCase = ImageAnalysis(analyzerConfig).apply {
+            analyzer = ImageAnalyzer(
+                activity,
+                applicationContext,
+                graphicOverlay,
+                preview,
+                viewFinder,
+                resources
+            )
+        }
 
         CameraX.bindToLifecycle(this, analyzerUseCase, preview)
     }
@@ -136,7 +147,8 @@ class CameraActivity : AppCompatActivity() {
         private val ctx: Context,
         private val overlay: GraphicOverlay,
         private val preview: Preview,
-        private val viewFinder: TextureView
+        private val viewFinder: TextureView,
+        private val resources: Resources
     ) : ImageAnalysis.Analyzer {
         private val TAG = "ImageAnalyzer"
         private var done = false
@@ -192,11 +204,11 @@ class CameraActivity : AppCompatActivity() {
                             val timer = object: CountDownTimer(1500, 1) {
                                 override fun onTick(millisUntilFinished: Long) {}
                                 override fun onFinish() {
-                                    done = true
                                     CameraX.unbind(preview)
                                     showNewComponentPrompt(labels[0].text)
                                 }
                             }
+                            done = true
                             timer.start()
                         } else {
                             done = false
@@ -213,7 +225,8 @@ class CameraActivity : AppCompatActivity() {
 
         private fun showNewComponentPrompt(label: String) {
             done = true
-            Toast.makeText(ctx, label, Toast.LENGTH_LONG).show()
+            activity.requestedOrientation = resources.configuration.orientation
+            Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE).show()
         }
 
         private fun showObjectBox(obj: FirebaseVisionObject, img: FirebaseVisionImage) {
