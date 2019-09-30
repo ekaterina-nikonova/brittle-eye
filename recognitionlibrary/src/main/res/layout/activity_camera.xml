@@ -37,4 +37,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@android:drawable/ic_menu_camera" />
 
+    <ImageView
+        android:id="@+id/previewImg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_gravity="bottom|start"
+        android:elevation="@dimen/bounding_box_corner_radius"
+        app:layout_dodgeInsetEdges="bottom"
+        app:srcCompat="@android:color/transparent" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

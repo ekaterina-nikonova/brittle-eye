@@ -6,6 +6,7 @@ import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.Resources
+import android.graphics.Bitmap
 import android.graphics.Matrix
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +17,7 @@ import android.util.Log
 import android.util.Size
 import android.util.SparseIntArray
 import android.view.*
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -32,6 +34,7 @@ import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabe
 import com.google.firebase.ml.vision.objects.FirebaseVisionObject
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions
+import kotlinx.android.synthetic.main.activity_camera.*
 import java.util.*
 
 class CameraActivity : AppCompatActivity() {
@@ -127,7 +130,8 @@ class CameraActivity : AppCompatActivity() {
                 graphicOverlay,
                 preview,
                 viewFinder,
-                resources
+                resources,
+                previewImg
             )
         }
 
@@ -214,7 +218,8 @@ class CameraActivity : AppCompatActivity() {
         private val overlay: GraphicOverlay,
         private val preview: Preview,
         private val viewFinder: TextureView,
-        private val resources: Resources
+        private val resources: Resources,
+        private val previewImg: ImageView
     ) : ImageAnalysis.Analyzer {
         private val TAG = this::class.java.simpleName
         private var done = false
@@ -270,6 +275,16 @@ class CameraActivity : AppCompatActivity() {
                             CameraX.unbind(preview)
                             showNewComponentPrompt(labels[0].text)
                             done = true
+
+                            val frame = extendedFrame(boundingBox, image.bitmap.width, image.bitmap.height)
+                            val croppedImage = Bitmap.createBitmap(
+                                image.bitmap,
+                                frame.getValue("left"),
+                                frame.getValue("top"),
+                                frame.getValue("width"),
+                                frame.getValue("height")
+                            )
+                            previewImg.setImageBitmap(croppedImage)
                         }
                     }
                     .addOnFailureListener {
@@ -278,6 +293,15 @@ class CameraActivity : AppCompatActivity() {
                     }
             }).start()
 
+        }
+
+        private fun extendedFrame(box: Rect, width: Int, height: Int) : Map<String, Int> {
+            return mapOf(
+                "left" to if (box.left - 16 > 0) box.left - 16 else box.left,
+                "top" to if (box.top - 16 > 0) box.top - 16 else box.top,
+                "width" to if (box.width() + 32 <= box.left + width) box.width() + 32 else box.width() ,
+                "height" to if (box.height() + 32 <= box.top + height) box.height() + 32 else box.height()
+            )
         }
 
         private fun showNewComponentPrompt(label: String) {
