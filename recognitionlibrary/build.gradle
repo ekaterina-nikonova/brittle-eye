@@ -5,6 +5,10 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 29
 
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+    }
 
     defaultConfig {
         minSdkVersion 22
@@ -25,7 +29,7 @@ android {
 
 }
 
-def camerax_version = '1.0.0-alpha01'
+def camerax_version = '1.0.0-alpha05'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -48,5 +52,3 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
 }
-
-apply plugin: 'com.google.gms.google-services'
