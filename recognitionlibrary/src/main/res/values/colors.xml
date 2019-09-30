@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="white">#FBFBFB</color>
+
+    <color name="bounding_box_gradient_start">#00FFFFFF</color>
+    <color name="bounding_box_gradient_end">@color/white</color>
+    <color name="object_confirmed_bg_gradient_start">#40000000</color>
+    <color name="object_confirmed_bg_gradient_end">#A0000000</color>
+    <color name="object_detected_bg_gradient_start">#00000000</color>
+    <color name="object_detected_bg_gradient_end">#66000000</color>
+</resources>

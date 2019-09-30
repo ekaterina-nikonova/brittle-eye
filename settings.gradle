@@ -1,2 +1,2 @@
-include ':app'
+include ':app', ':recognitionlibrary'
 rootProject.name='Brittle Eye'
