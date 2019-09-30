@@ -20,6 +20,7 @@ import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
+import androidx.core.app.ActivityCompat.recreate
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions
@@ -296,7 +297,12 @@ class CameraActivity : AppCompatActivity() {
             } else {
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
             }
-            Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE).show()
+
+            val snackbar = Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE)
+            snackbar.setAction(ctx.getString(R.string.snackbar_retry)) {
+                recreate(activity)
+            }
+            snackbar.show()
         }
 
         private fun showObjectBox(obj: FirebaseVisionObject, img: FirebaseVisionImage) {
@@ -306,8 +312,6 @@ class CameraActivity : AppCompatActivity() {
     }
 
     companion object {
-        private val TAG = CameraActivity::class.java.simpleName
-
         /** Helper function that gets the rotation of a [Display] in degrees */
         fun getDisplaySurfaceRotation(display: Display?) = when(display?.rotation) {
             Surface.ROTATION_0 -> 0
