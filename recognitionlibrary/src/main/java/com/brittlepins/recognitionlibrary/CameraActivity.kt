@@ -10,7 +10,6 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
@@ -268,22 +267,13 @@ class CameraActivity : AppCompatActivity() {
                 labeler.processImage(FirebaseVisionImage.fromBitmap(image.bitmap))
                     .addOnSuccessListener { labels ->
                         if (labels.size > 0 && labels[0].confidence >= 0.7f) {
-                            val timer = object: CountDownTimer(1500, 1) {
-                                override fun onTick(millisUntilFinished: Long) {}
-                                override fun onFinish() {
-                                    CameraX.unbind(preview)
-                                    showNewComponentPrompt(labels[0].text)
-                                }
-                            }
+                            CameraX.unbind(preview)
+                            showNewComponentPrompt(labels[0].text)
                             done = true
-                            timer.start()
-                        } else {
-                            done = false
                         }
                     }
                     .addOnFailureListener {
                         e -> Log.e(TAG, "Could not label image: ${e.message}")
-                        done = false
                         labelImage(image, boundingBox)
                     }
             }).start()
