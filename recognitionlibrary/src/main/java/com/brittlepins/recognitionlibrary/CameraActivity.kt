@@ -292,6 +292,7 @@ class CameraActivity : AppCompatActivity() {
 
         private fun showNewComponentPrompt(label: String) {
             done = true
+
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             } else {
@@ -300,6 +301,7 @@ class CameraActivity : AppCompatActivity() {
 
             val snackbar = Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE)
             snackbar.setAction(ctx.getString(R.string.snackbar_retry)) {
+                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
                 recreate(activity)
             }
             snackbar.show()
