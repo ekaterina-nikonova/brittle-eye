@@ -14,11 +14,9 @@ import android.os.CountDownTimer
 import android.os.Handler
 import android.os.HandlerThread
 import android.util.Log
+import android.util.Size
 import android.util.SparseIntArray
-import android.view.Surface
-import android.view.TextureView
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.camera.core.*
 import androidx.core.app.ActivityCompat
@@ -34,6 +32,7 @@ import com.google.firebase.ml.vision.label.FirebaseVisionOnDeviceAutoMLImageLabe
 import com.google.firebase.ml.vision.objects.FirebaseVisionObject
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions
+import java.util.*
 
 class CameraActivity : AppCompatActivity() {
     private val CAMERA_PERMISSION_REQUEST_CODE = 10
@@ -45,6 +44,10 @@ class CameraActivity : AppCompatActivity() {
     private lateinit var graphicOverlay: GraphicOverlay
     private lateinit var preview: Preview
     private lateinit var viewFinder: TextureView
+
+    private var bufferDimens: Size = Size(0, 0)
+    private var viewFinderDimens: Size = Size(0, 0)
+    private var viewFinderRotation: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +68,13 @@ class CameraActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         configureModel()
-        viewFinder.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateTransform() }
+        viewFinder.addOnLayoutChangeListener { view, left, top, right, bottom, _, _, _, _ ->
+            val viewFinder = view as TextureView
+            val newViewFinderDimens = Size(right - left, bottom - top)
+            Log.d(TAG, "View finder layout changed. Size: $newViewFinderDimens")
+            val rotation = getDisplaySurfaceRotation(viewFinder.display)
+            updateTransform(viewFinder, rotation, bufferDimens, newViewFinderDimens)
+        }
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -101,7 +110,9 @@ class CameraActivity : AppCompatActivity() {
             parent.addView(viewFinder, 0)
 
             viewFinder.surfaceTexture = it.surfaceTexture
-            updateTransform()
+
+            val rotation = getDisplaySurfaceRotation(viewFinder.display)
+            updateTransform(viewFinder, rotation, it.textureSize, viewFinderDimens)
         }
 
         val analyzerConfig = ImageAnalysisConfig.Builder().apply {
@@ -123,21 +134,74 @@ class CameraActivity : AppCompatActivity() {
         CameraX.bindToLifecycle(this, analyzerUseCase, preview)
     }
 
-    private fun updateTransform() {
+    private fun updateTransform(textureView: TextureView?, rotation: Int?, newBufferDimens: Size,
+                                newViewFinderDimens: Size) {
+        // This should not happen anyway, but now the linter knows
+        val textureView = textureView ?: return
+
+        if (rotation == viewFinderRotation &&
+            Objects.equals(newBufferDimens, bufferDimens) &&
+            Objects.equals(newViewFinderDimens, viewFinderDimens)) {
+            // Nothing has changed, no need to transform output again
+            return
+        }
+
+        if (rotation == null) {
+            // Invalid rotation - wait for valid inputs before setting matrix
+            return
+        } else {
+            // Update internal field with new inputs
+            viewFinderRotation = rotation
+        }
+
+        if (newBufferDimens.width == 0 || newBufferDimens.height == 0) {
+            // Invalid buffer dimens - wait for valid inputs before setting matrix
+            return
+        } else {
+            // Update internal field with new inputs
+            bufferDimens = newBufferDimens
+        }
+
+        if (newViewFinderDimens.width == 0 || newViewFinderDimens.height == 0) {
+            // Invalid view finder dimens - wait for valid inputs before setting matrix
+            return
+        } else {
+            // Update internal field with new inputs
+            viewFinderDimens = newViewFinderDimens
+        }
+
         val matrix = Matrix()
 
-        val centerX = viewFinder.width / 2f
-        val centerY = viewFinder.height / 2f
+        // Compute the center of the view finder
+        val centerX = viewFinderDimens.width / 2f
+        val centerY = viewFinderDimens.height / 2f
 
-        val rotationDegrees = when(viewFinder.display.rotation) {
-            Surface.ROTATION_0 -> 0
-            Surface.ROTATION_90 -> 90
-            Surface.ROTATION_180 -> 180
-            Surface.ROTATION_270 -> 270
-            else -> return
+        // Correct preview output to account for display rotation
+        matrix.postRotate(-viewFinderRotation!!.toFloat(), centerX, centerY)
+
+        // Buffers are rotated relative to the device's 'natural' orientation: swap width and height
+        val bufferRatio = bufferDimens.height / bufferDimens.width.toFloat()
+
+        val scaledWidth: Int
+        val scaledHeight: Int
+        // Match longest sides together -- i.e. apply center-crop transformation
+        if (viewFinderDimens.width > viewFinderDimens.height) {
+            scaledHeight = viewFinderDimens.width
+            scaledWidth = Math.round(viewFinderDimens.width * bufferRatio)
+        } else {
+            scaledHeight = viewFinderDimens.height
+            scaledWidth = Math.round(viewFinderDimens.height * bufferRatio)
         }
-        matrix.postRotate(-rotationDegrees.toFloat(), centerX, centerY)
-        viewFinder.setTransform(matrix)
+
+        // Compute the relative scale value
+        val xScale = scaledWidth / viewFinderDimens.width.toFloat()
+        val yScale = scaledHeight / viewFinderDimens.height.toFloat()
+
+        // Scale input buffers to fill the view finder
+        matrix.preScale(xScale, yScale, centerX, centerY)
+
+        // Finally, apply transformations to our TextureView
+        textureView.setTransform(matrix)
     }
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
@@ -152,7 +216,7 @@ class CameraActivity : AppCompatActivity() {
         private val viewFinder: TextureView,
         private val resources: Resources
     ) : ImageAnalysis.Analyzer {
-        private val TAG = "ImageAnalyzer"
+        private val TAG = this::class.java.simpleName
         private var done = false
 
         val objectDetectionOptions: FirebaseVisionObjectDetectorOptions = FirebaseVisionObjectDetectorOptions.Builder()
@@ -217,7 +281,7 @@ class CameraActivity : AppCompatActivity() {
                         }
                     }
                     .addOnFailureListener {
-                            e -> Log.e(TAG, "Could not label image: ${e.message}")
+                        e -> Log.e(TAG, "Could not label image: ${e.message}")
                         done = false
                         labelImage(image, boundingBox)
                     }
@@ -238,6 +302,19 @@ class CameraActivity : AppCompatActivity() {
         private fun showObjectBox(obj: FirebaseVisionObject, img: FirebaseVisionImage) {
             overlay.clear()
             overlay.add(ObjectGraphicInProminentMode(overlay, obj, ObjectConfirmationController(overlay), viewFinder, img))
+        }
+    }
+
+    companion object {
+        private val TAG = CameraActivity::class.java.simpleName
+
+        /** Helper function that gets the rotation of a [Display] in degrees */
+        fun getDisplaySurfaceRotation(display: Display?) = when(display?.rotation) {
+            Surface.ROTATION_0 -> 0
+            Surface.ROTATION_90 -> 90
+            Surface.ROTATION_180 -> 180
+            Surface.ROTATION_270 -> 270
+            else -> null
         }
     }
 }
