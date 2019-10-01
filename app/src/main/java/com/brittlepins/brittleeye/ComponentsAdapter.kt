@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import java.math.BigDecimal
 import java.math.RoundingMode
-import kotlin.math.roundToInt
 
 class ComponentsAdapter(private val components: ArrayList<Pair<String, Float>>)
     : RecyclerView.Adapter<ComponentsAdapter.ComponentViewHolder>() {

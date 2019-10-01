@@ -4,34 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="8dp">
+    android:orientation="vertical">
 
-    <ImageButton
-        android:id="@+id/copyLabelButton"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/copy_label_button_content_description"
-        android:scaleType="fitCenter"
-        android:tint="@color/object_confirmed_bg_gradient_start"
-        app:srcCompat="?attr/actionModeCopyDrawable" />
-
-    <TextView
-        android:id="@+id/confidenceTextView"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        tools:text="10%" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp">
 
-    <TextView
-        android:id="@+id/labelTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_weight="5"
-        android:textAlignment="viewStart"
-        tools:text="analogue input_output" />
+        <ImageButton
+            android:id="@+id/copyLabelButton"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/copy_label_button_content_description"
+            android:scaleType="fitCenter"
+            android:tint="@color/object_confirmed_bg_gradient_start"
+            app:srcCompat="?attr/actionModeCopyDrawable" />
 
+        <TextView
+            android:id="@+id/confidenceTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="8dp"
+            android:paddingEnd="8dp"
+            tools:text="10%" />
+
+        <TextView
+            android:id="@+id/labelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:textAlignment="viewStart"
+            tools:text="analogue input_output" />
+
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="?android:attr/listDivider" />
 </LinearLayout>
