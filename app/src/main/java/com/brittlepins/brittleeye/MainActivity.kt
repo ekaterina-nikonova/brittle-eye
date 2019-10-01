@@ -1,6 +1,7 @@
 package com.brittlepins.brittleeye
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -14,6 +15,8 @@ import kotlinx.android.synthetic.main.content_main.*
 import viewModel.MainViewModel
 
 class MainActivity : AppCompatActivity() {
+
+    val ACTION_COMPONENT = "com.brittlepins.recognitionlibrary.ACTION_COMPONENT"
 
     private lateinit var viewModel : MainViewModel
 
@@ -36,6 +39,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        if (intent.action.equals(ACTION_COMPONENT)) {
+            val imgBytes = intent.getByteArrayExtra("component_img")
+            val img = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
+            componentImageView.setImageBitmap(img)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {

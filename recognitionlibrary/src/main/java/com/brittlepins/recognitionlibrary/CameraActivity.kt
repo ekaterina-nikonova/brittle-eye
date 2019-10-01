@@ -2,6 +2,7 @@ package com.brittlepins.recognitionlibrary
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -35,6 +36,7 @@ import com.google.firebase.ml.vision.objects.FirebaseVisionObject
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetector
 import com.google.firebase.ml.vision.objects.FirebaseVisionObjectDetectorOptions
 import kotlinx.android.synthetic.main.activity_camera.*
+import java.io.ByteArrayOutputStream
 import java.util.*
 
 class CameraActivity : AppCompatActivity() {
@@ -60,6 +62,12 @@ class CameraActivity : AppCompatActivity() {
         viewFinder = findViewById(R.id.view_finder)
 
         graphicOverlay.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
+        retryFAB.setOnClickListener {
+            activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
+            recreate(activity)
+        }
+        retryFAB.hide()
 
         if (allPermissionsGranted()) {
             viewFinder.post { startCamera() }
@@ -222,6 +230,7 @@ class CameraActivity : AppCompatActivity() {
         private val previewImg: ImageView
     ) : ImageAnalysis.Analyzer {
         private val TAG = this::class.java.simpleName
+        val ACTION_COMPONENT = "com.brittlepins.recognitionlibrary.ACTION_COMPONENT"
         private var done = false
 
         val objectDetectionOptions: FirebaseVisionObjectDetectorOptions = FirebaseVisionObjectDetectorOptions.Builder()
@@ -257,7 +266,6 @@ class CameraActivity : AppCompatActivity() {
                             analyze(imageProxy, rotationDegrees)
                         }
                 }).start()
-
             }
         }
 
@@ -273,8 +281,8 @@ class CameraActivity : AppCompatActivity() {
                     .addOnSuccessListener { labels ->
                         if (labels.size > 0 && labels[0].confidence >= 0.7f) {
                             CameraX.unbind(preview)
-                            showNewComponentPrompt(labels[0].text)
                             done = true
+                            activity.retryFAB.show()
 
                             val frame = extendedFrame(boundingBox, image.bitmap.width, image.bitmap.height)
                             val croppedImage = Bitmap.createBitmap(
@@ -285,6 +293,8 @@ class CameraActivity : AppCompatActivity() {
                                 frame.getValue("height")
                             )
                             previewImg.setImageBitmap(croppedImage)
+
+                            showNewComponentPrompt(labels[0].text, croppedImage)
                         }
                     }
                     .addOnFailureListener {
@@ -304,7 +314,7 @@ class CameraActivity : AppCompatActivity() {
             )
         }
 
-        private fun showNewComponentPrompt(label: String) {
+        private fun showNewComponentPrompt(label: String, img: Bitmap) {
             done = true
 
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -314,9 +324,20 @@ class CameraActivity : AppCompatActivity() {
             }
 
             val snackbar = Snackbar.make(viewFinder, label, Snackbar.LENGTH_INDEFINITE)
-            snackbar.setAction(ctx.getString(R.string.snackbar_retry)) {
-                activity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                recreate(activity)
+            snackbar.setAction(ctx.getString(R.string.snackbar_save)) {
+                val stream = ByteArrayOutputStream()
+                img.compress(Bitmap.CompressFormat.PNG, 75, stream)
+                val imgBytes = stream.toByteArray()
+
+                val intent = Intent().apply {
+                    action = ACTION_COMPONENT
+                    putExtra("component_name", label)
+                    putExtra("component_img", imgBytes)
+                }
+
+                if (intent.resolveActivity(ctx.packageManager) != null) {
+                    activity.startActivity(intent)
+                }
             }
             snackbar.show()
         }

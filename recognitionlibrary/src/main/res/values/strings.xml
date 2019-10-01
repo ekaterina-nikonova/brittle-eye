@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Recognition Library</string>
     <string name="camera_permission_required">Camera permission is required.</string>
-    <string name="snackbar_retry">Retry</string>
+    <string name="snackbar_save">Save</string>
 </resources>
