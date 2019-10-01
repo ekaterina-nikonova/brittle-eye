@@ -3,9 +3,12 @@ package com.brittlepins.brittleeye
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.brittlepins.recognitionlibrary.CameraActivity
@@ -42,7 +45,21 @@ class MainActivity : AppCompatActivity() {
         if (intent.action.equals(ACTION_COMPONENT)) {
             val imgBytes = intent.getByteArrayExtra("component_img")
             val img = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.size)
+
             componentImageView.setImageBitmap(img)
+            prompt.text = intent.getStringExtra("component_name")
+
+            val set = ConstraintSet()
+            val layout: ConstraintLayout
+
+            layout = mainContentContainer as ConstraintLayout
+            set.clone(layout)
+            // The following breaks the connection.
+            set.clear(R.id.prompt, ConstraintSet.BOTTOM)
+            set.setMargin(R.id.prompt, ConstraintSet.TOP, 24)
+            // Comment out line above and uncomment line below to make the connection.
+            // set.connect(R.id.bottomText, ConstraintSet.TOP, R.id.imageView, ConstraintSet.BOTTOM, 0);
+            set.applyTo(layout)
         }
     }
 
