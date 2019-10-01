@@ -294,7 +294,13 @@ class CameraActivity : AppCompatActivity() {
                             )
                             previewImg.setImageBitmap(croppedImage)
 
-                            showNewComponentPrompt(labels[0].text, croppedImage)
+                            val allLabels = hashMapOf<String, Float>().apply {
+                                labels.forEach {
+                                    this[it.text] = it.confidence
+                                }
+                            }
+
+                            showNewComponentPrompt(labels[0].text, croppedImage, allLabels)
                         }
                     }
                     .addOnFailureListener {
@@ -314,7 +320,7 @@ class CameraActivity : AppCompatActivity() {
             )
         }
 
-        private fun showNewComponentPrompt(label: String, img: Bitmap) {
+        private fun showNewComponentPrompt(label: String, img: Bitmap, labels: HashMap<String, Float>) {
             done = true
 
             if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
@@ -333,6 +339,7 @@ class CameraActivity : AppCompatActivity() {
                     action = ACTION_COMPONENT
                     putExtra("component_name", label)
                     putExtra("component_img", imgBytes)
+                    putExtra("labels", labels)
                 }
 
                 if (intent.resolveActivity(ctx.packageManager) != null) {

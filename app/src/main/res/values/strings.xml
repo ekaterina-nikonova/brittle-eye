@@ -3,4 +3,5 @@
     <string name="action_settings">Settings</string>
     <string name="prompt_start">Press the button to open preview</string>
     <string name="component_image_view_content_description">Captured photo of component</string>
+    <string name="copy_label_button_content_description">Copy label</string>
 </resources>

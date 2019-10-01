@@ -7,10 +7,13 @@ import android.view.Gravity
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.brittlepins.recognitionlibrary.CameraActivity
 
 import kotlinx.android.synthetic.main.activity_main.*
@@ -48,6 +51,19 @@ class MainActivity : AppCompatActivity() {
 
             componentImageView.setImageBitmap(img)
             prompt.text = intent.getStringExtra("component_name")
+
+            val labels = intent.getSerializableExtra("labels") as HashMap<String, Float>
+            val labelArray = arrayListOf<Pair<String, Float>>()
+            labels.keys.forEach {
+                labelArray.add(Pair(it, labels[it]!!))
+            }
+
+            val manager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+            labelsRecyclerView.apply {
+                setHasFixedSize(true)
+                adapter = ComponentsAdapter(labelArray)
+                layoutManager = manager
+            }
 
             val set = ConstraintSet()
             val layout: ConstraintLayout
