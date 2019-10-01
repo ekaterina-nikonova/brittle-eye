@@ -1,5 +1,8 @@
 package com.brittlepins.brittleeye
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -14,6 +17,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.brittlepins.recognitionlibrary.CameraActivity
+import com.google.android.material.snackbar.Snackbar
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
@@ -24,11 +28,14 @@ class MainActivity : AppCompatActivity() {
     val ACTION_COMPONENT = "com.brittlepins.recognitionlibrary.ACTION_COMPONENT"
 
     private lateinit var viewModel : MainViewModel
+    private var clipboard : ClipboardManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
 
         viewModel = ViewModelProviders.of(this)
             .get(MainViewModel::class.java)
@@ -61,9 +68,15 @@ class MainActivity : AppCompatActivity() {
             labelsRecyclerView.apply {
                 setHasFixedSize(true)
                 adapter = ComponentsAdapter(labelArray) {
-                    val text = labelArray[it].first
-                    Log.d(this.javaClass.simpleName, text)
-                    TODO("copy text to clipboard")
+                    val label = labelArray[it].first
+                    Log.d(this.javaClass.simpleName, label)
+                    val clipData = ClipData.newPlainText("text", label)
+                    clipboard?.setPrimaryClip(clipData)
+
+                    val caption = "Label $label is copied to clipboard"
+                    Snackbar.make(mainContentScrollView, caption, Snackbar.LENGTH_LONG)
+                        .setAction("OK") {}
+                        .show()
                 }
                 layoutManager = manager
             }
