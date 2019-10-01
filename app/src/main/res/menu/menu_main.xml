@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.brittlepins.brittleeye.MainActivity">
     <item
+        android:id="@+id/action_view"
+        android:icon="@android:drawable/ic_menu_view"
+        android:title="@string/action_view"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/action_share"
         android:icon="@android:drawable/ic_menu_share"
         android:orderInCategory="100"

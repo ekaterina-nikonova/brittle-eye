@@ -8,4 +8,6 @@
     <string name="share_title">Send image to</string>
     <string name="no_apps_found">Could not find suitable apps</string>
     <string name="share_image_fail">Could not share image</string>
+    <string name="action_view">View</string>
+    <string name="view_title">View image with</string>
 </resources>

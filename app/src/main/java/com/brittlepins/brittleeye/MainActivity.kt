@@ -33,8 +33,8 @@ class MainActivity : AppCompatActivity() {
 
     val ACTION_COMPONENT = "com.brittlepins.recognitionlibrary.ACTION_COMPONENT"
 
-    private lateinit var viewModel : MainViewModel
-    private var clipboard : ClipboardManager? = null
+    private lateinit var viewModel: MainViewModel
+    private var clipboard: ClipboardManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,16 +112,14 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_share -> {
-                shareImage()
-                return true
-            }
+            R.id.action_view -> performImageAction("view")
+            R.id.action_share -> performImageAction("share")
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun shareImage() {
+    private fun performImageAction(imageAction: String): Boolean {
         try {
             val bitmap = componentImageView.drawToBitmap()
             val file = File(externalCacheDir, "temp.png")
@@ -132,21 +130,39 @@ class MainActivity : AppCompatActivity() {
             file.setReadable(true, false)
 
             val intent = Intent().apply {
-                action = Intent.ACTION_SEND
-                putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
-                type = "image/*"
+                when (imageAction) {
+                    "view" -> action = Intent.ACTION_VIEW
+                    "share" -> {
+                        action = Intent.ACTION_SEND
+                        putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                    }
+                }
+                setDataAndType(Uri.fromFile(file), "image/*")
             }
 
-            val title = getString(R.string.share_title)
-            val chooser : Intent = Intent.createChooser(intent, title)
+            var title = ""
+            when (imageAction) {
+                "view" -> title = getString(R.string.view_title)
+                "share" -> title = getString(R.string.share_title)
+            }
+            val chooser: Intent = Intent.createChooser(intent, title)
 
             if (intent.resolveActivity(packageManager) != null) {
                 startActivity(chooser)
             } else {
-                Snackbar.make(mainContentContainer, getString(R.string.no_apps_found), Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    mainContentContainer,
+                    getString(R.string.no_apps_found),
+                    Snackbar.LENGTH_SHORT
+                ).show()
             }
-        } catch(e: Exception) {
-            Snackbar.make(mainContentContainer, getString(R.string.share_image_fail), Snackbar.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            Snackbar.make(
+                mainContentContainer,
+                getString(R.string.share_image_fail),
+                Snackbar.LENGTH_SHORT
+            ).show()
         }
+        return true
     }
 }
