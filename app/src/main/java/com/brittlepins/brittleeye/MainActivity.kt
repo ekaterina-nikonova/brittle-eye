@@ -3,6 +3,7 @@ package com.brittlepins.brittleeye
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
@@ -59,7 +60,11 @@ class MainActivity : AppCompatActivity() {
             val manager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
             labelsRecyclerView.apply {
                 setHasFixedSize(true)
-                adapter = ComponentsAdapter(labelArray)
+                adapter = ComponentsAdapter(labelArray) {
+                    val text = labelArray[it].first
+                    Log.d(this.javaClass.simpleName, text)
+                    TODO("copy text to clipboard")
+                }
                 layoutManager = manager
             }
 
