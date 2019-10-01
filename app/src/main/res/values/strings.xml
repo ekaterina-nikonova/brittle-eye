@@ -4,4 +4,8 @@
     <string name="prompt_start">Press the button to open preview</string>
     <string name="component_image_view_content_description">Captured photo of component</string>
     <string name="copy_label_button_content_description">Copy label</string>
+    <string name="action_share">Share</string>
+    <string name="share_title">Send image to</string>
+    <string name="no_apps_found">Could not find suitable apps</string>
+    <string name="share_image_fail">Could not share image</string>
 </resources>
