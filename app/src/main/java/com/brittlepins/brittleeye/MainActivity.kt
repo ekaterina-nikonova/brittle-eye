@@ -132,8 +132,9 @@ class MainActivity : AppCompatActivity() {
             file.setReadable(true, false)
 
             val intent = Intent().apply {
-                action = Intent.ACTION_VIEW
-                setDataAndType(Uri.fromFile(file), "image/*")
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file))
+                type = "image/*"
             }
 
             val title = getString(R.string.share_title)
