@@ -4,6 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import java.math.BigDecimal
+import java.math.RoundingMode
+import kotlin.math.roundToInt
 
 class ComponentsAdapter(private val components: ArrayList<Pair<String, Float>>)
     : RecyclerView.Adapter<ComponentsAdapter.ComponentViewHolder>() {
@@ -33,7 +36,9 @@ class ComponentsAdapter(private val components: ArrayList<Pair<String, Float>>)
         }
 
         fun bind(confidence: Float, label: String) {
-            mConfidenceView?.text = confidence.toString()
+            val roundedConfidence = BigDecimal((confidence * 100).toDouble()).setScale(1, RoundingMode.HALF_EVEN)
+            val confidenceText = "$roundedConfidence %"
+            mConfidenceView?.text = confidenceText
             mLabelView?.text = label
         }
 
