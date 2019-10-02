@@ -127,7 +127,6 @@ class MainActivity : AppCompatActivity() {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
             stream.flush()
             stream.close()
-            file.setReadable(true, false)
 
             val intent = Intent().apply {
                 when (imageAction) {

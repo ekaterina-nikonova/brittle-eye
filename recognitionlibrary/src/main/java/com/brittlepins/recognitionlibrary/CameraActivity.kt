@@ -280,7 +280,7 @@ class CameraActivity : AppCompatActivity() {
                 labeler.processImage(FirebaseVisionImage.fromBitmap(image.bitmap))
                     .addOnSuccessListener { labels ->
                         if (labels.size > 0 && labels[0].confidence >= 0.7f) {
-                            CameraX.unbind(preview)
+                            CameraX.unbindAll()
                             done = true
                             activity.retryFAB.show()
 
