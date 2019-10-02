@@ -114,7 +114,7 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_view -> performImageAction("view")
             R.id.action_share -> performImageAction("share")
-            R.id.action_settings -> true
+            R.id.action_about -> startAboutActivity()
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -162,6 +162,12 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.LENGTH_SHORT
             ).show()
         }
+        return true
+    }
+
+    private fun startAboutActivity() : Boolean {
+        val intent = Intent(this, AboutActivity::class.java)
+        startActivity(intent)
         return true
     }
 }
