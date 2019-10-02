@@ -270,45 +270,61 @@ class CameraActivity : AppCompatActivity() {
         }
 
         private fun labelImage(image: FirebaseVisionImage, boundingBox: Rect) {
-            val labelerOptions = FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
-                .setRemoteModelName("components")
-                .setConfidenceThreshold(0f)
+            val conditions = FirebaseModelDownloadConditions.Builder().requireWifi().build()
+            val remoteModel = FirebaseRemoteModel.Builder("components")
+                .enableModelUpdates(true)
+                .setInitialDownloadConditions(conditions)
+                .setUpdatesDownloadConditions(conditions)
                 .build()
-            val labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions)
+            FirebaseModelManager.getInstance().registerRemoteModel(remoteModel)
 
-            Thread(Runnable {
-                labeler.processImage(FirebaseVisionImage.fromBitmap(image.bitmap))
-                    .addOnSuccessListener { labels ->
-                        if (labels.size > 0 && labels[0].confidence >= 0.7f) {
-                            CameraX.unbindAll()
-                            done = true
-                            activity.retryFAB.show()
+            FirebaseModelManager.getInstance().downloadRemoteModelIfNeeded(
+                FirebaseRemoteModel.Builder("components").build()
+            ).addOnSuccessListener {
+                Log.d("Firebasing", "Success")
 
-                            val frame = extendedFrame(boundingBox, image.bitmap.width, image.bitmap.height)
-                            val croppedImage = Bitmap.createBitmap(
-                                image.bitmap,
-                                frame.getValue("left"),
-                                frame.getValue("top"),
-                                frame.getValue("width"),
-                                frame.getValue("height")
-                            )
-                            previewImg.setImageBitmap(croppedImage)
+                val labelerOptions = FirebaseVisionOnDeviceAutoMLImageLabelerOptions.Builder()
+                    .setRemoteModelName("components")
+                    .setConfidenceThreshold(0f)
+                    .build()
+                val labeler = FirebaseVision.getInstance().getOnDeviceAutoMLImageLabeler(labelerOptions)
 
-                            val allLabels = hashMapOf<String, Float>().apply {
-                                labels.forEach {
-                                    this[it.text] = it.confidence
+                Thread(Runnable {
+                    labeler.processImage(FirebaseVisionImage.fromBitmap(image.bitmap))
+                        .addOnSuccessListener { labels ->
+                            if (labels.size > 0 && labels[0].confidence >= 0.7f) {
+                                CameraX.unbindAll()
+                                overlay.clear()
+                                done = true
+                                activity.retryFAB.show()
+
+                                val frame = extendedFrame(boundingBox, image.bitmap.width, image.bitmap.height)
+                                val croppedImage = Bitmap.createBitmap(
+                                    image.bitmap,
+                                    frame.getValue("left"),
+                                    frame.getValue("top"),
+                                    frame.getValue("width"),
+                                    frame.getValue("height")
+                                )
+                                previewImg.setImageBitmap(croppedImage)
+
+                                val allLabels = hashMapOf<String, Float>().apply {
+                                    labels.forEach {
+                                        this[it.text] = it.confidence
+                                    }
                                 }
+
+                                showNewComponentPrompt(labels[0].text, croppedImage, allLabels)
                             }
-
-                            showNewComponentPrompt(labels[0].text, croppedImage, allLabels)
                         }
-                    }
-                    .addOnFailureListener {
-                        e -> Log.e(TAG, "Could not label image: ${e.message}")
-                        labelImage(image, boundingBox)
-                    }
-            }).start()
-
+                        .addOnFailureListener {
+                                e -> Log.e(TAG, "Could not label image: ${e.message}")
+                            labelImage(image, boundingBox)
+                        }
+                }).start()
+            }.addOnFailureListener {
+                Log.e("Firebasing", "Could not download model")
+            }
         }
 
         private fun extendedFrame(box: Rect, width: Int, height: Int) : Map<String, Int> {
