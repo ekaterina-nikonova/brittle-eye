@@ -26,19 +26,13 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/componentList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aboutTextView">
-
-            <include
-                android:id="@+id/audioInputOutput"
-                layout="@layout/about_component_layout" />
-        </LinearLayout>
+            app:layout_constraintTop_toBottomOf="@id/aboutTextView" />
 
         <TextView
             android:id="@+id/aboutToolsTextView"

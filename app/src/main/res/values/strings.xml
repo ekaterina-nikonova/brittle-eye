@@ -45,4 +45,11 @@
         <b>Author</b>
         \n\n© 2019 Ekaterina Nikonova
     </string>
+    <string name="analogue_input_output">analogue input/output</string>
+    <string name="ausio_coder_decoder">audio coder/decoder</string>
+    <string name="bluetooth_module">bluetooth module</string>
+    <string name="dataflash_storage">dataflash storage</string>
+    <string name="flame_sensor">flame sensor</string>
+    <string name="heartbeat_sensor">heartbeat sensor</string>
+    <string name="reed_switch">reed switch</string>
 </resources>
