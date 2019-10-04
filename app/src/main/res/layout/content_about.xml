@@ -26,13 +26,58 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
+        <LinearLayout
             android:id="@+id/componentList"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/aboutTextView" />
+            app:layout_constraintTop_toBottomOf="@id/aboutTextView">
+
+            <TextView
+                android:id="@+id/analogueIOTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/analogue_input_output" />
+
+            <TextView
+                android:id="@+id/audioCodecTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/ausio_coder_decoder" />
+
+            <TextView
+                android:id="@+id/bluetoothTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/bluetooth_module" />
+
+            <TextView
+                android:id="@+id/dataflashTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/dataflash_storage" />
+
+            <TextView
+                android:id="@+id/flameSensorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/flame_sensor" />
+
+            <TextView
+                android:id="@+id/heartbeatSensorTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/heartbeat_sensor" />
+
+            <TextView
+                android:id="@+id/reedSwitchTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reed_switch" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/aboutToolsTextView"
