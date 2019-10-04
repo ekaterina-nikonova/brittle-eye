@@ -52,4 +52,5 @@
     <string name="flame_sensor">flame sensor</string>
     <string name="heartbeat_sensor">heartbeat sensor</string>
     <string name="reed_switch">reed switch</string>
+    <string name="freepikDisclaimer">Icons made by Freepik from Flaticon</string>
 </resources>
