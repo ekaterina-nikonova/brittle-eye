@@ -58,4 +58,6 @@
     <string name="freepik_link">https://www.flaticon.com/authors/freepik</string>
     <string name="linkedin_link">https://www.linkedin.com/in/ekaterinanikonova/</string>
     <string name="github_link">https://github.com/ekaterina-nikonova</string>
+    <string name="email_subject"><![CDATA[From Brittle Eye: <insert subject>]]></string>
+    <string name="admin_brittle_pins_email">admin@brittle-pins.com</string>
 </resources>

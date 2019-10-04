@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
             prompt.text = it
         })
 
-        fab.setOnClickListener {
+        emailFAB.setOnClickListener {
             val intent = Intent(this, CameraActivity::class.java)
             startActivity(intent)
         }
