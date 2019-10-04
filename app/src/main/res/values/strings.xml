@@ -53,4 +53,9 @@
     <string name="heartbeat_sensor">heartbeat sensor</string>
     <string name="reed_switch">reed switch</string>
     <string name="freepikDisclaimer">Icons made by Freepik from Flaticon</string>
+    <string name="check_out_my_github">Check out my GitHub</string>
+    <string name="check_out_my_linkedin">Check out my LinkedIn</string>
+    <string name="freepik_link">https://www.flaticon.com/authors/freepik</string>
+    <string name="linkedin_link">https://www.linkedin.com/in/ekaterinanikonova/</string>
+    <string name="github_link">https://github.com/ekaterina-nikonova</string>
 </resources>

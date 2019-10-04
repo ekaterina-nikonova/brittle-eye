@@ -3,10 +3,10 @@ package com.brittlepins.brittleeye
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_about.*
+import kotlinx.android.synthetic.main.content_about.*
 
 class AboutActivity : AppCompatActivity() {
 
@@ -19,14 +19,14 @@ class AboutActivity : AppCompatActivity() {
                 .setAction("Action", null).show()
         }
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        linkedinButton.setOnClickListener { openLink(R.string.linkedin_link) }
+        githubButton.setOnClickListener { openLink(R.string.github_link) }
+        resSourcesTextView.setOnClickListener { openLink(R.string.freepik_link) }
     }
 
-    fun openLinkedIn(view: View) {}
-
-    fun openGitHub(view: View) {}
-
-    fun openFlaticon(view: View) {
-        val url = Uri.parse("https://www.flaticon.com/authors/freepik")
+    private fun openLink(urlId: Int) {
+        val url = Uri.parse(getString(urlId))
         val intent = Intent(Intent.ACTION_VIEW, url)
         if (intent.resolveActivity(packageManager) != null) {
             startActivity(intent)
